@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harshal Patil | Network Engineer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-base: #0a0d14;
+            --bg-card: #111622;
+            --bg-terminal: #07090e;
+            --accent-green: #00ff66;
+            --accent-cyan: #00f0ff;
+            --accent-dim: rgba(0, 255, 102, 0.15);
+            --text-main: #e2e8f0;
+            --text-muted: #8492a6;
+            --border-color: #1e293b;
+            --font-mono: 'Fira Code', monospace;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        canvas#canvas-nodes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 13, 20, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span {
+            color: var(--accent-cyan);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.8rem;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            transition: 0.2s ease;
+        }
+
+        nav a:hover {
+            color: var(--accent-green);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        section {
+            padding: 6rem 0 3rem 0;
+        }
+
+        .hero-section {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            padding-top: 5rem;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            align-items: center;
+            width: 100%;
+        }
+
+        .hero-text h2 {
+            font-family: var(--font-mono);
+            color: var(--accent-cyan);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-text h1 {
+            font-size: 3rem;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .hero-text p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            font-family: var(--font-mono);
+            padding: 0.8rem 1.4rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-green);
+            color: #000;
+            border: 1px solid var(--accent-green);
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        /* Terminal Component */
+        .terminal-window {
+            background-color: var(--bg-terminal);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+
+        .terminal-header {
+            background: #151b27;
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background-color: #ff5f56; }
+        .dot-yellow { background-color: #ffbd2e; }
+        .dot-green { background-color: #27c93f; }
+
+        .terminal-title {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .terminal-body {
+            padding: 1rem;
+            height: 320px;
+            overflow-y: auto;
+            color: #a9b7c6;
+        }
+
+        .cmd-line {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .prompt {
+            color: var(--accent-green);
+            margin-right: 8px;
+        }
+
+        .cmd-input {
+            background: transparent;
+            border: none;
+            color: var(--accent-cyan);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            outline: none;
+            width: 100%;
+        }
+
+        .output {
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-family: var(--font-mono);
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title span {
+            color: var(--accent-green);
+        }
+
+        /* Cards Grid */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.5rem;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-green);
+        }
+
+        .card-icon {
+            font-size: 1.8rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            background: var(--accent-dim);
+            color: var(--accent-green);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 255, 102, 0.2);
+        }
+
+        /* Calculator Tool */
+        .calc-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .calc-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .field label {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .field input {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border-color);
+            padding: 0.7rem;
+            color: var(--text-main);
+            border-radius: 4px;
+            font-family: var(--font-mono);
+        }
+
+        .field input:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+
+        .calc-results {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.2rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #1e293b;
+            padding-bottom: 0.4rem;
+        }
+
+        .result-row:last-child {
+            border: none;
+        }
+
+        .result-val {
+            color: var(--accent-cyan);
+        }
+
+        /* Contact Section */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+        }
+
+        .contact-item i {
+            color: var(--accent-green);
+            font-size: 1.2rem;
+            width: 25px;
+        }
+
+        .contact-item a {
+            color: var(--text-main);
+            text-decoration: none;
+        }
+
+        .contact-item a:hover {
+            color: var(--accent-cyan);
+        }
+
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-grid, .calc-box, .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-text h1 {
+                font-size: 2.2rem;
+            }
+            nav ul {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas-nodes"></canvas>
+
+    <header>
+        <a href="#" class="logo">
+            <i class="fa-solid fa-network-wired"></i>
+            harshal<span>.net</span>
+        </a>
+        <nav>
+            <ul>
+                <li><a href="#about">// About</a></li>
+                <li><a href="#skills">// Skills</a></li>
+                <li><a href="#tools">// Subnet Calc</a></li>
+                <li><a href="#contact">// Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <!-- HERO SECTION -->
+        <section class="hero-section" id="about">
+            <div class="hero-grid">
+                <div class="hero-text">
+                    <h2>> System.init("Harshal Patil");</h2>
+                    <h1>Network Engineer & Infrastructure Enthusiast</h1>
+                    <p>BCA Student passionate about TCP/IP, Routing Protocols, VLANs, Security, and Network Troubleshooting. Focused on building robust, high-availability networks.</p>
+                    <div class="btn-group">
+                        <a href="#contact" class="btn btn-primary"><i class="fa-solid fa-terminal"></i> Get In Touch</a>
+                        <a href="https://github.com/harshalpatil-net" target="_blank" class="btn btn-outline"><i class="fa-brands fa-github"></i> GitHub</a>
+                    </div>
+                </div>
+
+                <!-- CLI TERMINAL -->
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="terminal-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="terminal-title">bash - harshal@net-core:~</div>
+                    </div>
+                    <div class="terminal-body" id="terminal-body">
+                        <div class="output">Welcome to Harshal's Interactive Terminal v1.0.0
+Type <span style="color:var(--accent-green)">'help'</span> to see available commands.</div>
+                        <div class="cmd-line">
+                            <span class="prompt">guest@harshal.net:~$</span>
+                            <input type="text" class="cmd-input" id="cli-input" autofocus>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SKILLS SECTION -->
+        <section id="skills">
+            <h2 class="section-title"><span>01.</span> Technical Skills</h2>
+            <div class="skills-grid">
+                <div class="card">
+                    <i class="fa-solid fa-diagram-project card-icon"></i>
+                    <h3>Networking & Protocols</h3>
+                    <div class="tag-list">
+                        <span class="tag">TCP/IP</span>
+                        <span class="tag">IPv4 / IPv6</span>
+                        <span class="tag">OSPF</span>
+                        <span class="tag">BGP</span>
+                        <span class="tag">VLAN / Trunking</span>
+                        <span class="tag">STP</span>
+                        <span class="tag">DHCP / DNS</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <i class="fa-solid fa-shield-halved card-icon"></i>
+                    <h3>Network Security</h3>
+                    <div class="tag-list">
+                        <span class="tag">Access Control Lists (ACLs)</span>
+                        <span class="tag">NAT / PAT</span>
+                        <span class="tag">VPN (IPsec/SSL)</span>
+                        <span class="tag">Firewall Basics</span>
+                        <span class="tag">SSH / Telnet</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <i class="fa-solid fa-toolbox card-icon"></i>
+                    <h3>Tools & Hardware</h3>
+                    <div class="tag-list">
+                        <span class="tag">Cisco Packet Tracer</span>
+                        <span class="tag">Wireshark</span>
+                        <span class="tag">GNS3</span>
+                        <span class="tag">PuTTY</span>
+                        <span class="tag">Nmap</span>
+                        <span class="tag">Cisco Routers & Switches</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <i class="fa-solid fa-server card-icon"></i>
+                    <h3>Systems & Scripting</h3>
+                    <div class="tag-list">
+                        <span class="tag">Linux (Ubuntu)</span>
+                        <span class="tag">Windows Server</span>
+                        <span class="tag">Bash</span>
+                        <span class="tag">Python Basics</span>
+                        <span class="tag">HTML/CSS</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SUBNET CALCULATOR UTILITY -->
+        <section id="tools">
+            <h2 class="section-title"><span>02.</span> Live Tool: Subnet Calculator</h2>
+            <div class="calc-box">
+                <div class="calc-input-group">
+                    <div class="field">
+                        <label for="ip-addr">IP Address</label>
+                        <input type="text" id="ip-addr" value="192.168.1.1">
+                    </div>
+                    <div class="field">
+                        <label for="cidr-val">CIDR Prefix (/<span id="cidr-num">24</span>)</label>
+                        <input type="range" id="cidr-val" min="8" max="30" value="24">
+                    </div>
+                    <button class="btn btn-primary" onclick="calculateSubnet()"><i class="fa-solid fa-calculator"></i> Calculate</button>
+                </div>
+                <div class="calc-results">
+                    <div class="result-row">
+                        <span>Subnet Mask:</span>
+                        <span class="result-val" id="res-mask">255.255.255.0</span>
+                    </div>
+                    <div class="result-row">
+                        <span>Network ID:</span>
+                        <span class="result-val" id="res-net">192.168.1.0</span>
+                    </div>
+                    <div class="result-row">
+                        <span>Broadcast ID:</span>
+                        <span class="result-val" id="res-bc">192.168.1.255</span>
+                    </div>
+                    <div class="result-row">
+                        <span>Usable Host Range:</span>
+                        <span class="result-val" id="res-range">192.168.1.1 - 192.168.1.254</span>
+                    </div>
+                    <div class="result-row">
+                        <span>Total Usable Hosts:</span>
+                        <span class="result-val" id="res-hosts">254</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT SECTION -->
+        <section id="contact">
+            <h2 class="section-title"><span>03.</span> Connect With Me</h2>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <p style="color:var(--text-muted);">Feel free to reach out for entry-level opportunities, networking discussions, or lab setups!</p>
+                    <div class="contact-item">
+                        <i class="fa-solid fa-envelope"></i>
+                        <a href="mailto:work.harshalpatil05@gmail.com">work.harshalpatil05@gmail.com</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fa-solid fa-phone"></i>
+                        <span>+91 9724630782</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>Surat, Gujarat, India</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fa-brands fa-linkedin"></i>
+                        <a href="https://www.linkedin.com/in/harshal-patil-a7b616445/" target="_blank">LinkedIn Profile</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fa-brands fa-github"></i>
+                        <a href="https://github.com/harshalpatil-net" target="_blank">GitHub Profile</a>
+                    </div>
+                </div>
+
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="terminal-title">Send Packet (Message)</div>
+                    </div>
+                    <div style="padding:1.2rem; display:flex; flex-direction:column; gap:1rem;">
+                        <div class="field">
+                            <label>Sender IP / Name</label>
+                            <input type="text" placeholder="Your Name">
+                        </div>
+                        <div class="field">
+                            <label>Source Email</label>
+                            <input type="email" placeholder="Your Email">
+                        </div>
+                        <div class="field">
+                            <label>Payload (Message)</label>
+                            <input type="text" placeholder="Type message here...">
+                        </div>
+                        <button class="btn btn-primary" onclick="alert('Message sent successfully!')"><i class="fa-solid fa-paper-plane"></i> Transmit Packet</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Harshal Patil | Built with HTML, CSS, JS & Network Aesthetics</p>
+    </footer>
+
+    <script>
+        // BACKGROUND NETWORK ANIMATION
+        const canvas = document.getElementById('canvas-nodes');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        const nodes = [];
+        const nodeCount = 45;
+
+        for (let i = 0; i < nodeCount; i++) {
+            nodes.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                radius: 2
+            });
+        }
+
+        function drawNodes() {
+            ctx.clearRect(0, 0, width, height);
+            
+            ctx.fillStyle = '#00ff66';
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.15)';
+
+            for (let i = 0; i < nodes.length; i++) {
+                let nodeA = nodes[i];
+                nodeA.x += nodeA.vx;
+                nodeA.y += nodeA.vy;
+
+                if (nodeA.x < 0 || nodeA.x > width) nodeA.vx *= -1;
+                if (nodeA.y < 0 || nodeA.y > height) nodeA.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(nodeA.x, nodeA.y, nodeA.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                for (let j = i + 1; j < nodes.length; j++) {
+                    let nodeB = nodes[j];
+                    let dist = Math.hypot(nodeA.x - nodeB.x, nodeA.y - nodeB.y);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(nodeA.x, nodeA.y);
+                        ctx.lineTo(nodeB.x, nodeB.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(drawNodes);
+        }
+        drawNodes();
+
+        // CLI TERMINAL INTERACTION
+        const cliInput = document.getElementById('cli-input');
+        const termBody = document.getElementById('terminal-body');
+
+        const commands = {
+            'help': 'Available commands:\n- about : Brief introduction\n- skills : Technical stack\n- whoami : User profile info\n- clear : Clear terminal screen',
+            'about': 'Harshal Patil | BCA Student & Network Engineer enthusiastic about Routing, Switching & Security.',
+            'skills': 'Protocols: OSPF, BGP, VLAN, STP, TCP/IP\nTools: Cisco Packet Tracer, Wireshark, GNS3, Linux',
+            'whoami': 'Guest User @ harshal.net (Privilege Level 1)',
+            'clear': 'CLEAR'
+        };
+
+        cliInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const val = cliInput.value.trim().toLowerCase();
+                const cmdLine = document.createElement('div');
+                cmdLine.className = 'output';
+                cmdLine.innerHTML = `<span style="color:var(--accent-green)">guest@harshal.net:~$</span> ${cliInput.value}`;
+                
+                termBody.insertBefore(cmdLine, cliInput.parentElement);
+
+                if (val in commands) {
+                    if (commands[val] === 'CLEAR') {
+                        termBody.innerHTML = '';
+                        termBody.appendChild(cliInput.parentElement);
+                    } else {
+                        const res = document.createElement('div');
+                        res.className = 'output';
+                        res.style.color = '#00f0ff';
+                        res.innerText = commands[val];
+                        termBody.insertBefore(res, cliInput.parentElement);
+                    }
+                } else if (val !== '') {
+                    const err = document.createElement('div');
+                    err.className = 'output';
+                    err.style.color = '#ff5f56';
+                    err.innerText = `Command not found: ${val}. Type 'help' for options.`;
+                    termBody.insertBefore(err, cliInput.parentElement);
+                }
+
+                cliInput.value = '';
+                termBody.scrollTop = termBody.scrollHeight;
+            }
+        });
+
+        // SUBNET CALCULATOR JS
+        const cidrSlider = document.getElementById('cidr-val');
+        const cidrNum = document.getElementById('cidr-num');
+
+        cidrSlider.addEventListener('input', () => {
+            cidrNum.innerText = cidrSlider.value;
+            calculateSubnet();
+        });
+
+        function calculateSubnet() {
+            const ip = document.getElementById('ip-addr').value.trim();
+            const cidr = parseInt(cidrSlider.value);
+            
+            const ipParts = ip.split('.').map(Number);
+            if (ipParts.length !== 4 || ipParts.some(p => isNaN(p) || p < 0 || p > 255)) {
+                alert('Please enter a valid IPv4 address.');
+                return;
+            }
+
+            const maskBinary = '1'.repeat(cidr) + '0'.repeat(32 - cidr);
+            const maskParts = [
+                parseInt(maskBinary.substring(0, 8), 2),
+                parseInt(maskBinary.substring(8, 16), 2),
+                parseInt(maskBinary.substring(16, 24), 2),
+                parseInt(maskBinary.substring(24, 32), 2)
+            ];
+
+            const netParts = ipParts.map((part, i) => part & maskParts[i]);
+            const broadcastParts = ipParts.map((part, i) => part | (~maskParts[i] & 255));
+
+            const totalHosts = Math.pow(2, 32 - cidr) - 2;
+
+            document.getElementById('res-mask').innerText = maskParts.join('.');
+            document.getElementById('res-net').innerText = netParts.join('.');
+            document.getElementById('res-bc').innerText = broadcastParts.join('.');
+            
+            const firstHost = [...netParts]; firstHost[3] += 1;
+            const lastHost = [...broadcastParts]; lastHost[3] -= 1;
+            
+            document.getElementById('res-range').innerText = `${firstHost.join('.')} - ${lastHost.join('.')}`;
+            document.getElementById('res-hosts').innerText = totalHosts > 0 ? totalHosts.toLocaleString() : 0;
+        }
+    </script>
+</body>
+</html>
